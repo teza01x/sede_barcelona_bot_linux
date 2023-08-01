@@ -10,29 +10,22 @@ headers = {
 path_to_chromedriver = '/root/telegram_bot/chromedriver'
 
 site_url = 'https://sedeclave.dgt.gob.es/WEB_NCIT_CONSULTA/solicitarCita.faces'
-api_key = '77104cfa8d086882be3d78e6d094f47b'
+api_key = ''
 gkey = '6LeK_-kZAAAAAEqP9TZnX-js2ldWjNxNnvReXsOY'
 
 data_base = 'database.db'
 
-telegram_token = '6042498124:AAGdfLtz6dYfQ2JWWJZ0IJzAT6MA3NvAqAo'
+telegram_token = ''
 
 proxy_file = '/root/telegram_bot/Webshare 100 proxies.txt'
-admin_id = 445855937
+admin_id = 000 # write your telegram id
 
-chat_list = ['1161433596', '445855937', '435055635', '603247380']
-
+chat_list = [] # list of telegram ids
 
 
 office_city = '#publicacionesForm\:oficina > optgroup:nth-child(4) > option:nth-child(2)'
 proc = '#publicacionesForm\:tipoTramite > option:nth-child(4)'
 country_list = ['#publicacionesForm\:pais > option:nth-child(4)', '#publicacionesForm\:pais > option:nth-child(4)', '#publicacionesForm\:pais > option:nth-child(8)']
-
-
-# office_city = '#publicacionesForm\:oficina > optgroup:nth-child(14) > option:nth-child(1)'
-# proc = '#publicacionesForm\:tipoTramite > option:nth-child(3)'
-# country_list = ['#publicacionesForm\:paiscee > optgroup:nth-child(2) > option:nth-child(1)', '#publicacionesForm\:paiscee > optgroup:nth-child(3) > option:nth-child(2)', '#publicacionesForm\:paiscee > optgroup:nth-child(7) > option:nth-child(1)']
-
 
 submit_button = '#publicacionesForm\:j_id70 > input'
 
