@@ -23,9 +23,12 @@ bot = AsyncTeleBot(telegram_token)
 async def start(message):
     try:
         user_id = message.chat.id
-        await bot.send_message(user_id, "Hello, this is a notifier bot!\nPlease wait for information about new procedures, the bot is actively searching.")
-    except telebot.apihelper.ApiException as e:
-        print(e)
+        try:
+            await bot.send_message(user_id, "Hello, this is a notifier bot!\nPlease wait for information about new procedures, the bot is actively searching.")
+        except telebot.apihelper.ApiException as e:
+            print(e)
+    except Exception as e:
+        print("Error in /start block {}".format(e))
         await asyncio.sleep(0.1)
 
 
@@ -37,21 +40,29 @@ async def launch_bot(message):
         if user_id == admin_id:
             try:
                 if get_bot_work_status() == "True":
-                    await bot.send_message(user_id, "The bot is already up and running.\n"
+                    try:
+                        await bot.send_message(user_id, "The bot is already up and running.\n"
                                                     "Wait for new information.\n"
                                                     "To stop the bot, use the /stop_bot command.")
+                    except telebot.apihelper.ApiException as e:
+                        print(e)
                 else:
                     change_work_status("True")
-                    await bot.send_message(user_id, "🤖 You have launched the bot. 🤖\n"
+                    try:
+                        await bot.send_message(user_id, "🤖 You have launched the bot. 🤖\n"
                                                     "To stop the bot, use the /stop_bot command.")
-            except telebot.apihelper.ApiException as e:
-                print(e)
+                    except telebot.apihelper.ApiException as e:
+                        print(e)
+            except Exception as e:
+                print("Error in /launch block #2\n{}".format(e))
                 await asyncio.sleep(0.1)
         else:
-            await bot.send_message(user_id, "You do not have permission to use this command.")
-    except telebot.apihelper.ApiException as e:
-        print(e)
-        await asyncio.sleep(0.1)
+            try:
+                await bot.send_message(user_id, "You do not have permission to use this command.")
+            except telebot.apihelper.ApiException as e:
+                print(e)
+    except Exception as e:
+            print(e)
 
 
 @bot.message_handler(commands=['stop_bot'])
@@ -62,19 +73,28 @@ async def launch_bot(message):
         if user_id == admin_id:
             try:
                 if get_bot_work_status() == "False":
-                    await bot.send_message(user_id, "The bot is currently disabled.\n"
+                    try:
+                        await bot.send_message(user_id, "The bot is currently disabled.\n"
                                                     "To launch, use the /launch_bot command.")
+                    except telebot.apihelper.ApiException as e:
+                        print(e)
                 else:
                     change_work_status("False")
-                    await bot.send_message(user_id, "🤖 You have stopped the bot. 🤖\n"
+                    try:
+                        await bot.send_message(user_id, "🤖 You have stopped the bot. 🤖\n"
                                                     "To launch, use the /launch_bot command.")
-            except telebot.apihelper.ApiException as e:
-                print(e)
+                    except telebot.apihelper.ApiException as e:
+                        print(e)
+            except Exception as e:
+                print("Error in /stop block #2\n{}".format(e))
                 await asyncio.sleep(0.1)
         else:
-            await bot.send_message(user_id, "You do not have permission to use this command.")
-    except telebot.apihelper.ApiException as e:
-        print(e)
+            try:
+                await bot.send_message(user_id, "You do not have permission to use this command.")
+            except telebot.apihelper.ApiException as e:
+                print(e)
+    except Exception as e:
+        print("Error in /stop block #1\n{}".format(e))
         await asyncio.sleep(0.1)
 
 
@@ -266,6 +286,7 @@ async def error_check(browser, office, pais):
         try:
             header = soup.find('div', class_='central')
             if header:
+                browser.save_screenshot("screenshot.png")
                 # print("АКТИВНУ ПРОЦЕДУРУ ЗНАЙДЕНО!\nОфіс: {}\nКраїна: {}".format(office, pais))
                 return ''
         except:
@@ -281,9 +302,16 @@ async def telegram_bot(error_text, office, pais):
         for chat_id in chat_list:
             try:
                 await bot.send_message(chat_id, "✅ ЗНАЙДЕНО АКТИВНУ ПРОЦЕДУРУ ✅\nОфіс: {}\nКраїна: {}".format(office, pais))
+                with open(f'{photo_name}', 'rb') as photo:
+                    response = requests.post(
+                        f'https://api.telegram.org/bot{telegram_token}/sendPhoto',
+                        files={'photo': photo},
+                        data={'chat_id': chat_id}
+                    )
             except telebot.apihelper.ApiException as e:
                 print(e)
                 await asyncio.sleep(0.1)
+
 
 async def captcha_post_google(google_sitekey, page_url, data_s, proxy):
     url = f'http://2captcha.com/in.php?key={api_key}&method=userrecaptcha&googlekey={google_sitekey}&pageurl={page_url}&data-s={data_s}&proxy={proxy}&proxytype={"HTTP"}'
@@ -392,14 +420,20 @@ async def get_data_from_website():
                 except Exception as e:
                     print(e)
                 await asyncio.sleep(2)
-                browser.get("https://sede.dgt.gob.es/es/otros-tramites/cita-previa-jefaturas/index.shtml#")
-                wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#aceptarcookie > a'))).click()
+                try:
+                    browser.get("https://sede.dgt.gob.es/es/otros-tramites/cita-previa-jefaturas/index.shtml#")
+                    wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#aceptarcookie > a'))).click()
+                except Exception as e:
+                    print(e)
                 try:
                     browser.get(site_url)
                     await asyncio.sleep(2)
                     for country in country_list:
                         await asyncio.sleep(0.1)
-                        await parsing_selenium(browser, country)
+                        try:
+                            await parsing_selenium(browser, country)
+                        except Exception as e:
+                            print(e)
                     browser.quit()
                 except Exception as e:
                     print(e)
@@ -420,7 +454,7 @@ async def main_processes():
 
 
 async def main():
-    bot_task = asyncio.create_task(bot.polling())
+    bot_task = asyncio.create_task(bot.polling(non_stop=True, request_timeout=120))
     data_mining_task = asyncio.create_task(main_processes())
 
     await asyncio.gather(bot_task, data_mining_task)
