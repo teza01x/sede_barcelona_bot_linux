@@ -274,8 +274,13 @@ async def injection(browser, captcha_key, call_back_value):
 
 
 async def error_check(browser, office, pais):
+    wait = WebDriverWait(browser, 30)
+
     html = browser.page_source
     soup = BeautifulSoup(html, 'html.parser')
+
+    wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, '#cabecera')))
+    time.sleep(3)
 
     try:
         error = soup.find('div', class_='buscadorInterno').find('li', class_='msgError').get_text().strip()
